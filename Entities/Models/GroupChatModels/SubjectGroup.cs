@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
@@ -12,5 +13,8 @@ namespace Entities.Models
         public int SubjectId { get; set; }
         public bool? IsActiveOnCurrentGroup { get; set; }
         public Guid? Guid { get; set; }
+
+        [ForeignKey("SubjectId")]
+        public Subject Subjects { get; set; }
     }
 }

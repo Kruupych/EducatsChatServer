@@ -49,7 +49,7 @@ namespace Services
                 if (groupChat.IsSubjectGroup)
                 {
                     var lastReadSubject = await _repository.GroupChatHistoryRepository.GetGroupChatHistoryAsync(userId, groupChat.Id, false);
-                    var subject = new SubjectChatsDto() { Id = groupChat.Id, Name = groupChat.GroupName, ShortName = groupChat.ShortName, Color = "#" };
+                    var subject = new SubjectChatsDto() { Id = groupChat.Id, Name = groupChat.GroupName, ShortName = groupChat.ShortName, Color = groupChat.Subjects.Color };
                     int? lastReaded;
                     GroupChat[] groupsModel = groups.FindAll(x => !x.IsSubjectGroup && x.SubjectId == groupChat.SubjectId).ToArray();
                     List<GroupChatDto> groupChats = new List<GroupChatDto>();

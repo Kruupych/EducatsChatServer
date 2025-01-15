@@ -15,7 +15,11 @@ namespace Repository
         {
         }
 
-        public async Task<IEnumerable<SubjectLecturer>> GetSubjects(int lecturerId) => await FindByCondition(c => c.LecturerId == lecturerId, false).ToListAsync();
+        public async Task<IEnumerable<SubjectLecturer>> GetSubjects(int lecturerId) => await FindByCondition(c => c.LecturerId == lecturerId, false)
+            .Include(c => c.Subjects)
+            .Where(c => !c.Subjects.IsArchive)
+            .OrderBy(c => c.Subjects.ShortName)
+            .ToListAsync();
 
     }
 }
