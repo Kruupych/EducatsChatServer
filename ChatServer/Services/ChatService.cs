@@ -21,10 +21,7 @@ namespace ChatServer.services
 
         public async Task<List<Chat>> GetChats(int userId)
         {
-#pragma warning disable CS0219 // Variable is assigned but its value is never used
-            int uId = 0;
-#pragma warning restore CS0219 // Variable is assigned but its value is never used
-            return (await _context.Users.Where(x => x.UserId == userId).Include(x => x.UserChats).FirstOrDefaultAsync()).UserChats;
+            return (await _context.Users.Where(x => x.UserId == userId).Include(x => x.UserChats).FirstOrDefaultAsync()).UserChats.ToList();
         }
 
         public async Task<List<Lecturer>> GetLecturers(int userId)

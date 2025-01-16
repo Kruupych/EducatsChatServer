@@ -14,7 +14,11 @@ namespace Entities.Models
         public bool? IsActiveOnCurrentGroup { get; set; }
         public Guid? Guid { get; set; }
 
-        [ForeignKey("SubjectId")]
-        public Subject Subjects { get; set; }
+        [ForeignKey(nameof(SubjectId))]
+        public virtual Subject Subject { get; set; }
+
+        [ForeignKey(nameof(GroupId))]
+
+        public virtual Group Group { get; set; }
     }
 }

@@ -22,6 +22,7 @@ namespace Entities.Models
         public bool? Confirmed { get; set; }
 
         public int GroupId { get; set; }
+        public virtual Group Group { get; set; }
 
 
         [NotMapped]

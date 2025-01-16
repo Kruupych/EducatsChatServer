@@ -10,5 +10,7 @@ namespace Contracts.Repositories
     public interface ISubjectGroupRepository
     {
         Task<IEnumerable<SubjectGroup>> GetSubjects(int groupId);
+
+        Task<IEnumerable<SubjectGroup>> GetGroups(int subjectId);
     }
 }

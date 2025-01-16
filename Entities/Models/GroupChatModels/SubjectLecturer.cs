@@ -14,7 +14,7 @@ namespace Entities.Models.GroupChatModels
         public int? Owner { get; set; }
         public Guid? Guid { get; set; }
 
-        [ForeignKey("SubjectId")]
-        public Subject Subjects { get; set; }
+        [ForeignKey(nameof(SubjectId))]
+        public virtual Subject Subject { get; set; }
     }
 }
