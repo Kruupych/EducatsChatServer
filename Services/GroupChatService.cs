@@ -2,6 +2,7 @@
 using Contracts;
 using Contracts.Services;
 using Entities.DTO;
+using Entities.Models;
 using Entities.Models.GroupChatModels;
 using Entities.Models.History;
 using System;
@@ -30,48 +31,10 @@ namespace Services
 
             if (isLector)
             {
-
                 var subjects = await _repository.SubjectLecturer.GetSubjects(userId);
                 foreach (var subject in subjects)
                 {
-                    bool subjectChatExists = await _repository.GroupChats.SubjectChatExists(subject.SubjectId);
-                    if (!subjectChatExists)
-                    {
-                        // Создаем общий чат для предмета
-                        await _repository.GroupChats.CreateChat(new GroupChat()
-                        {
-                            SubjectId = subject.SubjectId,
-                            IsSubjectGroup = true,
-                            IsStudentGroup = false,
-                            GroupName = subject.Subject.Name,
-                            ShortName = subject.Subject.ShortName
-                        });
-                    }
-
-                    // Получаем все группы, связанные с этим предметом
-                    var subjectGroups = await _repository.SubjectGroup.GetGroups(subject.SubjectId);
-
-                    foreach (var sg in subjectGroups)
-                    {
-                        // Проверяем наличие чата для каждой группы
-                        bool groupChatExists = await _repository.GroupChats.GroupChatExists(subject.SubjectId, sg.GroupId);
-                        if (!groupChatExists)
-                        {
-                            // Создаем чат для группы
-                            string groupName = $"{sg.Group.Name}";
-                            string shortName = $"{subject.Subject.ShortName}->{sg.Group.Name}";
-                            await _repository.GroupChats.CreateChat(new GroupChat()
-                            {
-                                SubjectId = subject.SubjectId,
-                                GroupId = sg.GroupId,
-                                GroupName = shortName,
-                                ShortName = groupName,
-                                IsStudentGroup = true,
-                                IsSubjectGroup = false,
-                            });
-                        }
-                    }
-
+                    await CreateChatsIfNotExist(subject.Subject);
                     groupChats.AddRange(await _repository.GroupChats.GetForLecturer(subject.SubjectId));
                 }
             }
@@ -81,6 +44,7 @@ namespace Services
                 var subjects = await _repository.SubjectGroup.GetSubjects(student.GroupId);
                 foreach (var subject in subjects)
                 {
+                    await CreateChatsIfNotExist(subject.Subject);
                     groupChats.AddRange(await _repository.GroupChats.GetForStudents(student.GroupId, subject.SubjectId));
                 }
             }
@@ -138,5 +102,45 @@ namespace Services
             return subjectChats;
         }
 
+        private async Task CreateChatsIfNotExist(Subject subject)
+        {
+            bool subjectChatExists = await _repository.GroupChats.SubjectChatExists(subject.Id);
+            if (!subjectChatExists)
+            {
+                // Создаем общий чат для предмета
+                await _repository.GroupChats.CreateChat(new GroupChat()
+                {
+                    SubjectId = subject.Id,
+                    IsSubjectGroup = true,
+                    IsStudentGroup = false,
+                    GroupName = subject.Name,
+                    ShortName = subject.ShortName
+                });
+            }
+
+            // Получаем все группы, связанные с этим предметом
+            var subjectGroups = await _repository.SubjectGroup.GetGroups(subject.Id);
+
+            foreach (var sg in subjectGroups)
+            {
+                // Проверяем наличие чата для каждой группы
+                bool groupChatExists = await _repository.GroupChats.GroupChatExists(subject.Id, sg.GroupId);
+                if (!groupChatExists)
+                {
+                    // Создаем чат для группы
+                    string groupName = $"{sg.Group.Name}";
+                    string shortName = $"{subject.ShortName} ({sg.Group.Name})";
+                    await _repository.GroupChats.CreateChat(new GroupChat()
+                    {
+                        SubjectId = subject.Id,
+                        GroupId = sg.GroupId,
+                        GroupName = groupName,
+                        ShortName = shortName,
+                        IsStudentGroup = true,
+                        IsSubjectGroup = false,
+                    });
+                }
+            }
+        }
     }
 }
