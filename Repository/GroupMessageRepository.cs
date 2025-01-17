@@ -20,7 +20,6 @@ namespace Repository
         }
         public async Task Save(GroupMessage msg)
         {
-            msg.Time = DateTime.Now;
             await Create(msg);
             await _repositoryContext.SaveChangesAsync();
         }
