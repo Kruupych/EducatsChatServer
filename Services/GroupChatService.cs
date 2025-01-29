@@ -34,6 +34,9 @@ namespace Services
                 var subjects = await _repository.SubjectLecturer.GetSubjects(userId);
                 foreach (var subject in subjects)
                 {
+                    if (subject.Subject.IsArchive)
+                        continue;
+
                     await CreateChatsIfNotExist(subject.Subject);
                     groupChats.AddRange(await _repository.GroupChats.GetForLecturer(subject.SubjectId));
                 }
@@ -44,6 +47,9 @@ namespace Services
                 var subjects = await _repository.SubjectGroup.GetSubjects(student.GroupId);
                 foreach (var subject in subjects)
                 {
+                    if (subject.Subject.IsArchive)
+                        continue;
+
                     await CreateChatsIfNotExist(subject.Subject);
                     groupChats.AddRange(await _repository.GroupChats.GetForStudents(student.GroupId, subject.SubjectId));
                 }
@@ -89,6 +95,12 @@ namespace Services
         private async Task CreateChatsIfNotExist(Subject subject)
         {
             bool subjectChatExists = await _repository.GroupChats.SubjectChatExists(subject.Id);
+
+            if (subject.IsArchive)
+            {
+                return;
+            }
+
             if (!subjectChatExists)
             {
                 // Создаем общий чат для предмета
