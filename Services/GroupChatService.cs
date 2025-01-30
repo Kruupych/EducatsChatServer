@@ -31,12 +31,10 @@ namespace Services
 
             if (isLector)
             {
-                var subjects = await _repository.SubjectLecturer.GetSubjects(userId);
+                var subjects = (await _repository.SubjectLecturer.GetSubjects(userId)).GroupBy(s => s.SubjectId).Select(g => g.First());
+
                 foreach (var subject in subjects)
                 {
-                    if (subject.Subject.IsArchive)
-                        continue;
-
                     await CreateChatsIfNotExist(subject.Subject);
                     groupChats.AddRange(await _repository.GroupChats.GetForLecturer(subject.SubjectId));
                 }
@@ -44,12 +42,9 @@ namespace Services
             else
             {
                 var student = await _repository.Students.GetStudentAsync(userId, false);
-                var subjects = await _repository.SubjectGroup.GetSubjects(student.GroupId);
+                var subjects = (await _repository.SubjectGroup.GetSubjects(student.GroupId)).GroupBy(s => s.SubjectId).Select(g => g.First());
                 foreach (var subject in subjects)
                 {
-                    if (subject.Subject.IsArchive)
-                        continue;
-
                     await CreateChatsIfNotExist(subject.Subject);
                     groupChats.AddRange(await _repository.GroupChats.GetForStudents(student.GroupId, subject.SubjectId));
                 }
